@@ -1,0 +1,3 @@
+<resources>
+    <string name="top_sheet_behavior" translatable="false">com.github.techisfun.android.topsheet.TopSheetBehavior</string>
+</resources>
