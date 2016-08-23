@@ -1,13 +1,21 @@
 TopSheet - a "top" version of BottomSheet
 =========================================
 
-Usage
+TopSheetBehaviour
+-----
+```java
+View sheet = findViewById(R.id.top_sheet);
+TopSheetBehavior.from(sheet).setState(TopSheetBehavior.STATE_EXPANDED);
+```
+
+TopSheetDialog
 -----
 ```java
 TopSheetDialog dialog = new TopSheetDialog(this);
-        dialog.setContentView(R.layout.sheet_content);
-        dialog.show();
+dialog.setContentView(R.layout.sheet_content);
+dialog.show();
 ```
+
 
 
 License
