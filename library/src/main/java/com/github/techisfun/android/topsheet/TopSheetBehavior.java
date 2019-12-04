@@ -55,53 +55,53 @@ import java.lang.ref.WeakReference;
 public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
 
     /**
-     * Callback for monitoring events about bottom sheets.
+     * Callback for monitoring events about top sheets.
      */
     public abstract static class TopSheetCallback {
 
         /**
-         * Called when the bottom sheet changes its state.
+         * Called when the top sheet changes its state.
          *
-         * @param bottomSheet The bottom sheet view.
+         * @param topSheet The top sheet view.
          * @param newState    The new state. This will be one of {@link #STATE_DRAGGING},
          *                    {@link #STATE_SETTLING}, {@link #STATE_EXPANDED},
          *                    {@link #STATE_COLLAPSED}, or {@link #STATE_HIDDEN}.
          */
-        public abstract void onStateChanged(@NonNull View bottomSheet, @State int newState);
+        public abstract void onStateChanged(@NonNull View topSheet, @State int newState);
 
         /**
-         * Called when the bottom sheet is being dragged.
+         * Called when the top sheet is being dragged.
          *
-         * @param bottomSheet The bottom sheet view.
-         * @param slideOffset The new offset of this bottom sheet within its range, from 0 to 1
+         * @param topSheet The top sheet view.
+         * @param slideOffset The new offset of this top sheet within its range, from 0 to 1
          *                    when it is moving upward, and from 0 to -1 when it moving downward.
          * @param isOpening   detect showing
          */
-        public abstract void onSlide(@NonNull View bottomSheet, float slideOffset, @Nullable Boolean isOpening);
+        public abstract void onSlide(@NonNull View topSheet, float slideOffset, @Nullable Boolean isOpening);
     }
 
     /**
-     * The bottom sheet is dragging.
+     * The top sheet is dragging.
      */
     public static final int STATE_DRAGGING = 1;
 
     /**
-     * The bottom sheet is settling.
+     * The top sheet is settling.
      */
     public static final int STATE_SETTLING = 2;
 
     /**
-     * The bottom sheet is expanded.
+     * The top sheet is expanded.
      */
     public static final int STATE_EXPANDED = 3;
 
     /**
-     * The bottom sheet is collapsed.
+     * The top sheet is collapsed.
      */
     public static final int STATE_COLLAPSED = 4;
 
     /**
-     * The bottom sheet is hidden.
+     * The top sheet is hidden.
      */
     public static final int STATE_HIDDEN = 5;
 
@@ -207,7 +207,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         int savedTop = child.getTop();
         // First let the parent lay it out
         parent.onLayoutChild(child, layoutDirection);
-        // Offset the bottom sheet
+        // Offset the top sheet
         mParentHeight = parent.getHeight();
         mMinOffset = Math.max(-child.getHeight(), -(child.getHeight() - mPeekHeight));
         mMaxOffset = 0;
@@ -268,7 +268,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         if (!mIgnoreEvents && mViewDragHelper.shouldInterceptTouchEvent(event)) {
             return true;
         }
-        // We have to handle cases that the ViewDragHelper does not capture the bottom sheet because
+        // We have to handle cases that the ViewDragHelper does not capture the top sheet because
         // it is not the top most view of its parent. This is not necessary when the touch event is
         // happening over the scrolling content as nested scrolling logic handles that case.
         View scroll = mNestedScrollingChildRef.get();
@@ -299,7 +299,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
             }
             mVelocityTracker.addMovement(event);
             // The ViewDragHelper tries to capture only the top-most View. We have to explicitly tell it
-            // to capture the bottom sheet in case it is not captured and the touch slop is passed.
+            // to capture the top sheet in case it is not captured and the touch slop is passed.
             if (action == MotionEvent.ACTION_MOVE && !mIgnoreEvents) {
                 if (Math.abs(mInitialY - event.getY()) > mViewDragHelper.getTouchSlop()) {
                     mViewDragHelper.captureChildView(child, event.getPointerId(event.getActionIndex()));
@@ -404,10 +404,10 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     }
 
     /**
-     * Sets the height of the bottom sheet when it is collapsed.
+     * Sets the height of the top sheet when it is collapsed.
      *
-     * @param peekHeight The height of the collapsed bottom sheet in pixels.
-     * @attr ref android.support.design.R.styleable#TopSheetBehavior_Params_behavior_peekHeight
+     * @param peekHeight The height of the collapsed top sheet in pixels.
+     * @attr ref com.google.android.material.R.styleable#TopSheetBehavior_Params_behavior_peekHeight
      */
     public final void setPeekHeight(int peekHeight) {
         mPeekHeight = Math.max(0, peekHeight);
@@ -418,68 +418,68 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     }
 
     /**
-     * Gets the height of the bottom sheet when it is collapsed.
+     * Gets the height of the top sheet when it is collapsed.
      *
-     * @return The height of the collapsed bottom sheet.
-     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
+     * @return The height of the collapsed top sheet.
+     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
      */
     public final int getPeekHeight() {
         return mPeekHeight;
     }
 
     /**
-     * Sets whether this bottom sheet can hide when it is swiped down.
+     * Sets whether this top sheet can hide when it is swiped down.
      *
-     * @param hideable {@code true} to make this bottom sheet hideable.
-     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_hideable
+     * @param hideable {@code true} to make this top sheet hideable.
+     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_hideable
      */
     public void setHideable(boolean hideable) {
         mHideable = hideable;
     }
 
     /**
-     * Gets whether this bottom sheet can hide when it is swiped down.
+     * Gets whether this top sheet can hide when it is swiped down.
      *
-     * @return {@code true} if this bottom sheet can hide.
-     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_hideable
+     * @return {@code true} if this top sheet can hide.
+     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_hideable
      */
     public boolean isHideable() {
         return mHideable;
     }
 
     /**
-     * Sets whether this bottom sheet should skip the collapsed state when it is being hidden
+     * Sets whether this top sheet should skip the collapsed state when it is being hidden
      * after it is expanded once. Setting this to true has no effect unless the sheet is hideable.
      *
-     * @param skipCollapsed True if the bottom sheet should skip the collapsed state.
-     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
+     * @param skipCollapsed True if the top sheet should skip the collapsed state.
+     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
      */
     public void setSkipCollapsed(boolean skipCollapsed) {
         mSkipCollapsed = skipCollapsed;
     }
 
     /**
-     * Sets whether this bottom sheet should skip the collapsed state when it is being hidden
+     * Sets whether this top sheet should skip the collapsed state when it is being hidden
      * after it is expanded once.
      *
-     * @return Whether the bottom sheet should skip the collapsed state.
-     * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
+     * @return Whether the top sheet should skip the collapsed state.
+     * @attr ref com.google.android.material.R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
      */
     public boolean getSkipCollapsed() {
         return mSkipCollapsed;
     }
 
     /**
-     * Sets a callback to be notified of bottom sheet events.
+     * Sets a callback to be notified of top sheet events.
      *
-     * @param callback The callback to notify when bottom sheet events occur.
+     * @param callback The callback to notify when top sheet events occur.
      */
     public void setTopSheetCallback(TopSheetCallback callback) {
         mCallback = callback;
     }
 
     /**
-     * Sets the state of the bottom sheet. The bottom sheet will transition to that state with
+     * Sets the state of the top sheet. The top sheet will transition to that state with
      * animation.
      *
      * @param state One of {@link #STATE_COLLAPSED}, {@link #STATE_EXPANDED}, or
@@ -518,7 +518,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     }
 
     /**
-     * Gets the current state of the bottom sheet.
+     * Gets the current state of the top sheet.
      *
      * @return One of {@link #STATE_EXPANDED}, {@link #STATE_COLLAPSED}, {@link #STATE_DRAGGING},
      * and {@link #STATE_SETTLING}.
@@ -539,9 +539,9 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
             return;
         }
         mState = state;
-        View bottomSheet = mViewRef.get();
-        if (bottomSheet != null && mCallback != null) {
-            mCallback.onStateChanged(bottomSheet, state);
+        View topSheet = mViewRef.get();
+        if (topSheet != null && mCallback != null) {
+            mCallback.onStateChanged(topSheet, state);
         }
     }
 
@@ -668,15 +668,15 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     };
 
     private void dispatchOnSlide(int top) {
-        View bottomSheet = mViewRef.get();
-        if (bottomSheet != null && mCallback != null) {
+        View topSheet = mViewRef.get();
+        if (topSheet != null && mCallback != null) {
 
             Boolean isOpening = oldState == TopSheetBehavior.STATE_COLLAPSED;
 
             if (top < mMinOffset) {
-                mCallback.onSlide(bottomSheet, (float) (top - mMinOffset) / mPeekHeight, isOpening);
+                mCallback.onSlide(topSheet, (float) (top - mMinOffset) / mPeekHeight, isOpening);
             } else {
-                mCallback.onSlide(bottomSheet,
+                mCallback.onSlide(topSheet,
                         (float) (top - mMinOffset) / ((mMaxOffset - mMinOffset)), isOpening);
             }
         }
