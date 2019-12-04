@@ -19,25 +19,29 @@ package com.github.techisfun.android.topsheet;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
-import android.support.v4.view.AbsSavedState;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.NestedScrollingChild;
-import android.support.v4.view.VelocityTrackerCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.view.AbsSavedState;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.os.ParcelableCompat;
+import androidx.core.os.ParcelableCompatCreatorCallbacks;
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.NestedScrollingChild;
+import androidx.core.view.VelocityTrackerCompat;
+import androidx.core.view.ViewCompat;
+import androidx.customview.widget.ViewDragHelper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -71,8 +75,9 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
          * @param bottomSheet The bottom sheet view.
          * @param slideOffset The new offset of this bottom sheet within its range, from 0 to 1
          *                    when it is moving upward, and from 0 to -1 when it moving downward.
+         * @param isOpening   detect showing
          */
-        public abstract void onSlide(@NonNull View bottomSheet, float slideOffset);
+        public abstract void onSlide(@NonNull View bottomSheet, float slideOffset, @Nullable Boolean isOpening);
     }
 
     /**
@@ -166,11 +171,11 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     public TopSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
-                android.support.design.R.styleable.BottomSheetBehavior_Layout);
+                com.google.android.material.R.styleable.BottomSheetBehavior_Layout);
         setPeekHeight(a.getDimensionPixelSize(
-                android.support.design.R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, 0));
-        setHideable(a.getBoolean(android.support.design.R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
-        setSkipCollapsed(a.getBoolean(android.support.design.R.styleable.BottomSheetBehavior_Layout_behavior_skipCollapsed,
+                com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, 0));
+        setHideable(a.getBoolean(com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
+        setSkipCollapsed(a.getBoolean(com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_skipCollapsed,
                 false));
         a.recycle();
         ViewConfiguration configuration = ViewConfiguration.get(context);
@@ -282,20 +287,23 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         if (mState == STATE_DRAGGING && action == MotionEvent.ACTION_DOWN) {
             return true;
         }
-        mViewDragHelper.processTouchEvent(event);
-        // Record the velocity
-        if (action == MotionEvent.ACTION_DOWN) {
-            reset();
-        }
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        mVelocityTracker.addMovement(event);
-        // The ViewDragHelper tries to capture only the top-most View. We have to explicitly tell it
-        // to capture the bottom sheet in case it is not captured and the touch slop is passed.
-        if (action == MotionEvent.ACTION_MOVE && !mIgnoreEvents) {
-            if (Math.abs(mInitialY - event.getY()) > mViewDragHelper.getTouchSlop()) {
-                mViewDragHelper.captureChildView(child, event.getPointerId(event.getActionIndex()));
+        if (mViewDragHelper != null) {
+            //no crash
+            mViewDragHelper.processTouchEvent(event);
+            // Record the velocity
+            if (action == MotionEvent.ACTION_DOWN) {
+                reset();
+            }
+            if (mVelocityTracker == null) {
+                mVelocityTracker = VelocityTracker.obtain();
+            }
+            mVelocityTracker.addMovement(event);
+            // The ViewDragHelper tries to capture only the top-most View. We have to explicitly tell it
+            // to capture the bottom sheet in case it is not captured and the touch slop is passed.
+            if (action == MotionEvent.ACTION_MOVE && !mIgnoreEvents) {
+                if (Math.abs(mInitialY - event.getY()) > mViewDragHelper.getTouchSlop()) {
+                    mViewDragHelper.captureChildView(child, event.getPointerId(event.getActionIndex()));
+                }
             }
         }
         return !mIgnoreEvents;
@@ -520,7 +528,13 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         return mState;
     }
 
+    int oldState = mState;
+
     private void setStateInternal(@State int state) {
+        if (state == TopSheetBehavior.STATE_COLLAPSED || state == TopSheetBehavior.STATE_EXPANDED) {
+            oldState = state;
+        }
+
         if (mState == state) {
             return;
         }
@@ -656,11 +670,14 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     private void dispatchOnSlide(int top) {
         View bottomSheet = mViewRef.get();
         if (bottomSheet != null && mCallback != null) {
+
+            Boolean isOpening = oldState == TopSheetBehavior.STATE_COLLAPSED;
+
             if (top < mMinOffset) {
-                mCallback.onSlide(bottomSheet, (float) (top - mMinOffset) / mPeekHeight);
+                mCallback.onSlide(bottomSheet, (float) (top - mMinOffset) / mPeekHeight, isOpening);
             } else {
                 mCallback.onSlide(bottomSheet,
-                        (float) (top - mMinOffset) / ((mMaxOffset - mMinOffset)));
+                        (float) (top - mMinOffset) / ((mMaxOffset - mMinOffset)), isOpening);
             }
         }
     }
@@ -691,10 +708,12 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         @State
         final int state;
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         public SavedState(Parcel source) {
             this(source, null);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         public SavedState(Parcel source, ClassLoader loader) {
             super(source, loader);
             //noinspection ResourceType
@@ -714,6 +733,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
 
         public static final Creator<SavedState> CREATOR = ParcelableCompat.newCreator(
                 new ParcelableCompatCreatorCallbacks<SavedState>() {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public SavedState createFromParcel(Parcel in, ClassLoader loader) {
                         return new SavedState(in, loader);

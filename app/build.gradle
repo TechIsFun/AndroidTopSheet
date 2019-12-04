@@ -20,8 +20,8 @@ android {
 }
 
 dependencies {
-    compile project(":library")
-    testCompile 'junit:junit:4.12'
-    compile rootProject.ext.appcompat
-    compile rootProject.ext.design
+    implementation project(":library")
+    testImplementation 'junit:junit:4.12'
+    implementation rootProject.ext.appcompat
+    implementation rootProject.ext.design
 }

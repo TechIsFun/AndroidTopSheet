@@ -22,7 +22,8 @@ android {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
-    compile rootProject.ext.design
-    compile rootProject.ext.appcompat
+    testImplementation 'junit:junit:4.12'
+    implementation rootProject.ext.design
+    implementation rootProject.ext.appcompat
+    implementation rootProject.ext.annotation
 }

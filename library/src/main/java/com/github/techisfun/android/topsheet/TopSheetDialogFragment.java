@@ -2,7 +2,8 @@ package com.github.techisfun.android.topsheet;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDialogFragment;
+
+import androidx.appcompat.app.AppCompatDialogFragment;
 
 /**
  * Created by andrea on 23/08/16.
