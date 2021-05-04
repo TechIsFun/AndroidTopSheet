@@ -18,17 +18,19 @@ package com.github.techisfun.android.topsheet;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StyleRes;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.app.AppCompatDialog;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.app.AppCompatDialog;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 /**
  * Created by andrea on 23/08/16.
@@ -134,7 +136,7 @@ public class TopSheetDialog extends AppCompatDialog {
             // If the provided theme is 0, then retrieve the dialogTheme from our theme
             TypedValue outValue = new TypedValue();
             if (context.getTheme().resolveAttribute(
-                    android.support.design.R.attr.bottomSheetDialogTheme, outValue, true)) {
+                    R.attr.bottomSheetDialogTheme, outValue, true)) {
                 themeId = outValue.resourceId;
             } else {
                 // bottomSheetDialogTheme is not provided; we default to our light theme
@@ -144,7 +146,7 @@ public class TopSheetDialog extends AppCompatDialog {
         return themeId;
     }
 
-    private TopSheetBehavior.TopSheetCallback mTopSheetCallback
+    private final TopSheetBehavior.TopSheetCallback mTopSheetCallback
             = new TopSheetBehavior.TopSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View topSheet,
