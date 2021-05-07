@@ -1,6 +1,7 @@
 TopSheet - a "top" version of BottomSheet
 =========================================
 
+![Build Status](https://github.com/techisfun/AndroidTopSheet/actions/workflows/android.yml/badge.svg)
 [![Release](https://jitpack.io/v/TechIsFun/AndroidTopSheet.svg)](https://jitpack.io/#TechIsFun/AndroidTopSheet)
 
 TopSheetBehaviour
